@@ -6,8 +6,8 @@ const bodyParser = require('body-parser')
 
 // API IMPORTS
 const authApi = require('./authentication/auth');
-const productRoutes = require('./api/routes/products')
-const orderRoutes = require('./api/routes/orders')
+const productRoutes = require('./api/routes/routes/products')
+const orderRoutes = require('./api/routes/routes/orders');
 
 
 
