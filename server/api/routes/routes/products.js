@@ -1,14 +1,43 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const multer = require('multer');
+const moment = require('moment');
+
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, process.cwd() + '/uploads/');
+  },
+  filename: function(req, file, cb) {
+    cb(null, `${moment().format('YYYY-MM-DD-HH-mm-SS')}-${file.originalname}`);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
+     // Accept file
+   cb(null, true)
+  } else {
+    // we can reject file with the help of below code
+    cb(null, false)
+  }
+}
+
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 1024 * 1024 * 5
+  },
+  fileFilter: fileFilter
+});
 
 const Product = require("../dbModals/productsDb");
-const { json } = require("body-parser");
 
 // GET ALL PRODUCT DETAIL LIST
 router.get("/", (req, res, next) => {
   Product.find()
-    .select("name price _id")
+    .select("name price _id productImage")
     .exec()
     .then((productList) => {
       const response = {
@@ -17,6 +46,7 @@ router.get("/", (req, res, next) => {
           return {
             product: data.name,
             price: data.price,
+            productImage: data.productImage,
             id: data._id,
             request: {
               type: "GET",
@@ -35,11 +65,13 @@ router.get("/", (req, res, next) => {
 });
 
 // ADD PRODUCT DETAILS
-router.post("/", (req, res, next) => {
+router.post("/", upload.single('productImage'), (req, res, next) => {
+  console.log('uploaded', req.file);
   const product = new Product({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
     price: req.body.price,
+    productImage: req.file.path
   });
   product
     .save()
@@ -69,7 +101,7 @@ router.post("/", (req, res, next) => {
 router.get("/:productId", (req, res, next) => {
   const id = req.params.productId;
   Product.findById(id)
-    .select('name price _id')
+    .select('name price _id productImage')
     .exec()
     .then((data) => {
         res.status(200).json({
@@ -91,7 +123,7 @@ router.get("/:productId", (req, res, next) => {
 // UPDATE PRODUCT DETAILS
 router.patch("/:productId", (req, res, next) => {
   const id = req.params.productId;
-  Product.updateMany({ _id: id }, { $set: req.body })
+  Product.updateOne({ _id: id }, { $set: req.body })
     .exec()
     .then((obj) => {
         console.log('dddddddddddddddddddddd', obj),
@@ -115,7 +147,7 @@ router.delete("/:productId", (req, res, next) => {
   const id = req.params.productId;
   Product.remove({ _id: id })
     .exec()
-    .then((result) => {
+    .then(() => {
       res.status(200).json({
         message: "Success",
         request: {

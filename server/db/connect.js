@@ -5,8 +5,8 @@ const connectDB = () => {
     mongoose.set('strictQuery', false);
 
     return mongoose.connect(URI , { useNewUrlParser : true, useUnifiedTopology : true})
-    .then(() => console.log('> MongoDB Connected'))
-    .catch(err => console.log(`> Error while connecting to mongoDB : ${err.message}` ))
+    .then(() => {console.log('> MongoDB Connected'); return true })
+    .catch(err => {console.log(`> Error while connecting to mongoDB : ${err.message}` ); return false})
 }
 
 module.exports = connectDB

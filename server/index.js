@@ -13,6 +13,7 @@ const orderRoutes = require('./api/routes/routes/orders');
 
 // MIDDLEWARE
 app.use(morgan('dev'));
+app.use('/uploads', express.static('uploads')); // Making folder public
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
@@ -59,7 +60,17 @@ app.use((error, req, res, next) => {
     })
 });
 
-app.listen(8000, function () {
-    connectDB()
+// Best approach is to connect data base first then to the server
+let dataBaseConnection = async () => {
+   const connectedDb = await connectDB();
+   if (!connectedDb) {
+    console.log('Database Connection could not happen');
+    return 
+   }
+   app.listen(8000, function () {
     console.log('Example app listening on port 8000.');
 });
+};
+
+dataBaseConnection()
+
