@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
-    username: {
+    _id: mongoose.Schema.Types.ObjectId,
+    email: {
       type: String,
       unique: true,
-      required: true
+      required: true,
+      match: /[a-z0-9!#$%&'*+/=?^_{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g
     },
     password: {
       type: String,
@@ -16,18 +18,8 @@ const userSchema = new mongoose.Schema({
     updatedAt: {
       type: Date,
       default: Date.now
-    },
-    email: {
-      type: String,
-    },
-    name: {
-      type: String,
-    },
-    role: {
-      type: String,
-      default: 'user'
     }
   });
   
-  const AuthCollection = mongoose.model('SpecificUser', userSchema)
+  const AuthCollection = mongoose.model('specificUser', userSchema)
   module.exports = AuthCollection

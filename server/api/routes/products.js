@@ -4,6 +4,12 @@ const mongoose = require("mongoose");
 const multer = require('multer');
 const moment = require('moment');
 
+// Imports
+const Product = require("../dbModals/productsDb");
+const checkAuth = require('../middleware/check-auth')
+
+
+// Multer storage options
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
     cb(null, process.cwd() + '/uploads/');
@@ -16,10 +22,10 @@ const storage = multer.diskStorage({
 const fileFilter = (req, file, cb) => {
   if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
      // Accept file
-   cb(null, true)
+   cb( null, true)
   } else {
     // we can reject file with the help of below code
-    cb(null, false)
+    cb('custom error', false)
   }
 }
 
@@ -32,7 +38,9 @@ const upload = multer({
   fileFilter: fileFilter
 });
 
-const Product = require("../dbModals/productsDb");
+
+
+
 
 // GET ALL PRODUCT DETAIL LIST
 router.get("/", (req, res, next) => {
@@ -65,8 +73,7 @@ router.get("/", (req, res, next) => {
 });
 
 // ADD PRODUCT DETAILS
-router.post("/", upload.single('productImage'), (req, res, next) => {
-  console.log('uploaded', req.file);
+router.post("/", checkAuth,  upload.single('productImage'), (req, res, next) => {
   const product = new Product({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
@@ -121,7 +128,7 @@ router.get("/:productId", (req, res, next) => {
 });
 
 // UPDATE PRODUCT DETAILS
-router.patch("/:productId", (req, res, next) => {
+router.patch("/:productId", checkAuth, (req, res, next) => {
   const id = req.params.productId;
   Product.updateOne({ _id: id }, { $set: req.body })
     .exec()
@@ -143,7 +150,7 @@ router.patch("/:productId", (req, res, next) => {
 });
 
 // DELETE PRODUCT FROM THE LIST
-router.delete("/:productId", (req, res, next) => {
+router.delete("/:productId", checkAuth, (req, res, next) => {
   const id = req.params.productId;
   Product.remove({ _id: id })
     .exec()
