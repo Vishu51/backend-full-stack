@@ -3,6 +3,8 @@ var app = express();
 const connectDB = require("./db/connect");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
+require('dotenv').config();
+// const cors = require('cors');
 
 // API IMPORTS
 const userRoutes = require("./authentication/auth");
@@ -28,6 +30,8 @@ app.use((req, res, next) => {
   }
   next();
 });
+// Enable CORS
+// app.use(cors());
 
 // ROUTES WHICH SHOULD HANDEL REQUESTS
 app.use("/users", userRoutes);

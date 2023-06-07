@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
-URI="mongodb+srv://vishal:" + process.env.MONGO_ATLAS_PW + "@cluster0.wanef.mongodb.net/Cluster0?retryWrites=true&w=majority"
+const constants = require('../assets/constants.json');
+URI="mongodb+srv://vishal:" + constants.MONGO_ATLAS_PW + "@cluster0.wanef.mongodb.net/Cluster0?retryWrites=true&w=majority"
 const connectDB = () => {
     // Mongoose DEPRECATED WARNING SETUP
     mongoose.set('strictQuery', false);
